@@ -1,5 +1,5 @@
 """
-🐄 Livestock Guardian — Modern UI (v2, redesigned)
+🐄 Livestock Guardian — Modern UI (v2.1, all bugs fixed)
 Professional Cattle Biometric Identification System
 """
 
@@ -24,22 +24,18 @@ st.set_page_config(
     menu_items={
         'Get Help': 'https://github.com/yourusername/livestock-guardian',
         'Report a bug': 'mailto:your@email.com',
-        'About': "# Livestock Guardian\nAI-Powered Cattle Identification System\n\nVersion 2.0"
+        'About': "# Livestock Guardian\nAI-Powered Cattle Identification System\n\nVersion 2.1"
     }
 )
 
 # ════════════════════════════════════════════════════════════
 # DESIGN TOKENS + CSS
-# Palette pulled from the Livestock Guardian brand: forest green
-# + gold shield logo, cream/off-white backgrounds, rounded pill
-# buttons, icon-led status cards. Change tokens once, it
-# propagates everywhere — no more hunting hex codes in markup.
 # ════════════════════════════════════════════════════════════
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
     :root {
-        /* Brand — forest green + gold, from the app logo */
+        /* Brand — forest green + gold */
         --c-primary: #2E7D32;
         --c-primary-dark: #14532D;
         --c-primary-soft: #E8F3E9;
@@ -59,7 +55,7 @@ st.markdown("""
         --c-info: #2E7D32;
         --c-info-soft: #E8F3E9;
 
-        /* Neutrals — warm cream background like the reference screens */
+        /* Neutrals */
         --c-text: #20241F;
         --c-text-muted: #6B7268;
         --c-text-faint: #9AA199;
@@ -67,7 +63,7 @@ st.markdown("""
         --c-surface: #FFFFFF;
         --c-bg: #F8F6F1;
 
-        /* Spacing / radius — generous, rounded, like the mobile cards */
+        /* Spacing / radius */
         --radius-sm: 10px;
         --radius-md: 16px;
         --radius-lg: 22px;
@@ -127,7 +123,7 @@ st.markdown("""
         letter-spacing: 0.02em;
     }
 
-    /* ─── SECURE / VERIFIED PILL (matches "Secure · ID" chip) ─── */
+    /* ─── SECURE PILL ─── */
     .secure-pill {
         display: inline-flex; align-items: center; gap: 0.3rem;
         background: var(--c-success-soft); color: var(--c-primary);
@@ -165,7 +161,7 @@ st.markdown("""
     .stat-number { font-family: var(--font-heading); font-size: 2rem; font-weight: 800; color: var(--c-text); margin: 0; line-height: 1; }
     .stat-label { color: var(--c-text-muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.35rem; }
 
-    /* ─── INFO TILE (2-up grid like the Species/Breed/Age/Weight cards) ─── */
+    /* ─── INFO TILES ─── */
     .tile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; margin: 0.75rem 0; }
     .info-tile {
         background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-md);
@@ -175,7 +171,7 @@ st.markdown("""
     .info-tile .tile-label { color: var(--c-text-muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; margin: 0.3rem 0 0.1rem; }
     .info-tile .tile-value { font-family: var(--font-heading); font-weight: 700; font-size: 1.05rem; color: var(--c-text); }
 
-    /* ─── ANIMAL / GENERIC CARDS ─── */
+    /* ─── ANIMAL CARDS ─── */
     .animal-card {
         background: var(--c-surface);
         padding: 1.1rem 1.25rem;
@@ -195,8 +191,7 @@ st.markdown("""
     .badge-active { background: var(--c-success-soft); color: var(--c-primary); }
     .badge-stolen { background: var(--c-danger-soft); color: var(--c-danger); }
 
-    /* ─── ALERTS — icon-in-circle + title + body, like the Theft Alert /
-       Health Warning cards in the reference dashboard ─── */
+    /* ─── ALERTS ─── */
     .alert {
         border-radius: var(--radius-md);
         padding: 1rem 1.15rem;
@@ -222,11 +217,10 @@ st.markdown("""
     .alert-info    { background: var(--c-gold-soft); }
     .alert-info .alert-icon { background: rgba(201,162,39,0.25); color: var(--c-gold-dark); }
     .alert-info .alert-body h3 { color: var(--c-gold-dark); }
-    /* One subtle, finite emphasis for genuinely urgent items — not infinite */
     .alert-danger.urgent { animation: flash-once 1.4s ease-out 1; }
     @keyframes flash-once { 0% { box-shadow: 0 0 0 4px rgba(198,40,40,0.22); } 100% { box-shadow: 0 0 0 0 rgba(198,40,40,0); } }
 
-    /* ─── BUTTONS — rounded pill, matching Login/Sign Up/Enroll buttons ─── */
+    /* ─── BUTTONS ─── */
     .stButton > button {
         border-radius: var(--radius-pill);
         font-weight: 700;
@@ -268,7 +262,7 @@ st.markdown("""
     .stTabs [data-baseweb="tab"] { padding: 0.6rem 1.2rem; background: transparent; border-radius: var(--radius-pill); font-weight: 600; font-family: var(--font-heading); color: var(--c-text-muted); border: none; }
     .stTabs [aria-selected="true"] { background: var(--c-primary) !important; color: white !important; }
 
-    /* ─── INPUTS — rounded rectangle, matching login/signup fields ─── */
+    /* ─── INPUTS ─── */
     .stTextInput input, .stTextArea textarea, .stNumberInput input, .stSelectbox > div > div, .stDateInput input {
         border-radius: var(--radius-sm) !important;
         border: 1.5px solid var(--c-border) !important;
@@ -288,7 +282,7 @@ st.markdown("""
     [data-testid="stMetric"] { background: var(--c-surface); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--c-border); }
     [data-testid="stMetricValue"] { color: var(--c-text); font-size: 1.7rem !important; font-family: var(--font-heading); }
 
-    /* ─── ID CARD — green + gold, like the shield logo ─── */
+    /* ─── ID CARD ─── */
     .id-card {
         background: linear-gradient(135deg, var(--c-primary-dark) 0%, var(--c-primary) 100%);
         color: white;
@@ -309,8 +303,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ════════════════════════════════════════════════════════════
-# SECURITY HELPER — escape all user-controlled text before
-# injecting into unsafe_allow_html markup
+# SECURITY HELPER
 # ════════════════════════════════════════════════════════════
 def esc(value, default="N/A"):
     if value is None or value == "":
@@ -319,75 +312,117 @@ def esc(value, default="N/A"):
 
 # ════════════════════════════════════════════════════════════
 # REUSABLE UI COMPONENTS
-# Centralizing these means one visual change updates every
-# instance — and every value passing through is escaped.
 # ════════════════════════════════════════════════════════════
 def alert(kind, title, message="", urgent=False):
-    """Icon-in-circle alert card, matching the Theft Alert / Health Warning
-    style from the reference dashboard."""
+    """Icon-in-circle alert card"""
     icons = {"success": "✓", "danger": "🔒", "warning": "!", "info": "ℹ"}
     cls = f"alert alert-{kind}" + (" urgent" if urgent and kind == "danger" else "")
     msg_html = f"<p>{message}</p>" if message else ""
-    st.markdown(f"""
-    <div class="{cls}">
-        <div class="alert-icon">{icons.get(kind, '')}</div>
-        <div class="alert-body">
-            <h3>{title}</h3>
-            {msg_html}
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    html = (
+        f'<div class="{cls}">'
+        f'<div class="alert-icon">{icons.get(kind, "")}</div>'
+        f'<div class="alert-body">'
+        f'<h3>{title}</h3>'
+        f'{msg_html}'
+        f'</div>'
+        f'</div>'
+    )
+    st.markdown(html, unsafe_allow_html=True)
 
 def secure_pill(label="Secure", icon="🛡️"):
-    """Small chip like the 'Secure · ID' badge on the animal profile card."""
     return f'<span class="secure-pill">{icon} {esc(label)}</span>'
 
 def stat_card(value, label, color="var(--c-primary)"):
-    st.markdown(f"""
-    <div class="stat-card" style="--bar-color: {color};">
-        <p class="stat-number" style="color: {color};">{esc(value, '0')}</p>
-        <p class="stat-label">{esc(label)}</p>
-    </div>
-    """, unsafe_allow_html=True)
+    html = (
+        f'<div class="stat-card" style="--bar-color: {color};">'
+        f'<p class="stat-number" style="color: {color};">{esc(value, "0")}</p>'
+        f'<p class="stat-label">{esc(label)}</p>'
+        f'</div>'
+    )
+    st.markdown(html, unsafe_allow_html=True)
 
 def info_tile(icon, label, value):
-    """2-up tile like the Species / Breed / Age / Weight cards on the
-    reference animal profile screen."""
-    st.markdown(f"""
-    <div class="info-tile">
-        <div class="tile-icon">{icon}</div>
-        <div class="tile-label">{esc(label)}</div>
-        <div class="tile-value">{esc(value)}</div>
-    </div>
-    """, unsafe_allow_html=True)
+    html = (
+        f'<div class="info-tile">'
+        f'<div class="tile-icon">{icon}</div>'
+        f'<div class="tile-label">{esc(label)}</div>'
+        f'<div class="tile-value">{esc(value)}</div>'
+        f'</div>'
+    )
+    st.markdown(html, unsafe_allow_html=True)
 
 def id_card(id_value, subtitle="Verified Animal ID"):
-    st.markdown(f"""
-    <div class="id-card">
-        <div class="id-title">🐄 Livestock Identity Card</div>
-        <div class="id-value">{esc(id_value)}</div>
-        <div class="id-subtitle">{esc(subtitle)}</div>
-    </div>
-    """, unsafe_allow_html=True)
+    html = (
+        f'<div class="id-card">'
+        f'<div class="id-title">🐄 Livestock Identity Card</div>'
+        f'<div class="id-value">{esc(id_value)}</div>'
+        f'<div class="id-subtitle">{esc(subtitle)}</div>'
+        f'</div>'
+    )
+    st.markdown(html, unsafe_allow_html=True)
 
 def status_badge(is_stolen):
     return '<span class="badge badge-stolen">🚨 STOLEN</span>' if is_stolen else '<span class="badge badge-active">✓ ACTIVE</span>'
 
 def animal_summary_card(animal, accent="var(--c-primary)", extra_rows=""):
+    """Render animal summary card - FIXED to use single-line HTML"""
     badge = status_badge(animal.get("is_stolen"))
     weight_row = f" • ⚖️ {esc(animal.get('weight'))}kg" if animal.get("weight") else ""
-    st.markdown(f"""
-    <div class="animal-card" style="--bar-color: {accent};">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.75rem;">
-            <div>
-                <div class="animal-id">{esc(animal.get('livestock_id'))}</div>
-                <div class="animal-breed">🐂 {esc(animal.get('breed'))} • 🎨 {esc(animal.get('color'))} • ⚥ {esc(animal.get('gender'))}{weight_row}</div>
-                {extra_rows}
-            </div>
-            <div>{badge}</div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    
+    html = (
+        f'<div class="animal-card" style="--bar-color: {accent};">'
+        f'<div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.75rem;">'
+        f'<div style="flex:1;">'
+        f'<div class="animal-id">{esc(animal.get("livestock_id"))}</div>'
+        f'<div class="animal-breed">🐂 {esc(animal.get("breed"))} • 🎨 {esc(animal.get("color"))} • ⚥ {esc(animal.get("gender"))}{weight_row}</div>'
+        f'{extra_rows}'
+        f'</div>'
+        f'<div>{badge}</div>'
+        f'</div>'
+        f'</div>'
+    )
+    st.markdown(html, unsafe_allow_html=True)
+
+def stolen_animal_card(animal):
+    """Render stolen animal card - FIXED single-line HTML to prevent rendering bugs"""
+    owner = animal.get('owners', {}) or {}
+    date_str = str(animal.get('stolen_reported_at', ''))[:10]
+    
+    # Build description row separately
+    desc_html = ""
+    if animal.get('stolen_description'):
+        desc_html = f'<div class="meta-row" style="font-style:italic;">📝 {esc(animal.get("stolen_description"))}</div>'
+    
+    # Build entire HTML as single concatenated string (NO multi-line f-string!)
+    card_html = (
+        '<div class="animal-card" style="--bar-color: var(--c-danger);">'
+        '<div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem;">'
+        '<div style="flex:1;">'
+        f'<div class="animal-id" style="color:var(--c-danger);">🚨 {esc(animal.get("livestock_id"))}</div>'
+        f'<div class="animal-breed">{esc(animal.get("breed"))} • {esc(animal.get("color"))} • {esc(animal.get("gender"))}</div>'
+        f'<div class="meta-row">📍 <b>Location:</b> {esc(animal.get("stolen_location"))}</div>'
+        f'<div class="meta-row">📅 <b>Reported:</b> {esc(date_str)}</div>'
+        f'<div class="meta-row">👤 <b>Owner:</b> {esc(owner.get("name"), "Unknown")}</div>'
+        f'<div class="meta-row">📞 <b>Contact:</b> {esc(owner.get("phone"), "Unknown")}</div>'
+        f'{desc_html}'
+        '</div>'
+        '<div><span class="badge badge-stolen">STOLEN</span></div>'
+        '</div>'
+        '</div>'
+    )
+    
+    st.markdown(card_html, unsafe_allow_html=True)
+
+def owner_info_card(owner):
+    """Render owner info card - FIXED single-line HTML"""
+    html = (
+        '<div class="animal-card">'
+        f'<div class="meta-row"><b>Name:</b> {esc(owner.get("name"), "Unknown")}</div>'
+        f'<div class="meta-row"><b>CNIC:</b> {esc(owner.get("cnic"), "Unknown")}</div>'
+        f'<div class="meta-row"><b>Phone:</b> {esc(owner.get("phone"), "Unknown")}</div>'
+        '</div>'
+    )
+    st.markdown(html, unsafe_allow_html=True)
 
 # ════════════════════════════════════════════════════════════
 # LOAD SECRETS
@@ -421,7 +456,7 @@ if "current_page" not in st.session_state:
     st.session_state.current_page = "Home"
 
 # ════════════════════════════════════════════════════════════
-# HELPER FUNCTIONS (business logic — unchanged from original)
+# HELPER FUNCTIONS
 # ════════════════════════════════════════════════════════════
 def hash_password(pw):
     return hashlib.sha256(pw.encode()).hexdigest()
@@ -502,92 +537,104 @@ with st.sidebar:
             st.image(LOGO_PATH, use_container_width=True)
         else:
             st.markdown("<div style='text-align:center; font-size:2.8rem;'>🐄</div>", unsafe_allow_html=True)
-    st.markdown("""
-    <div style='text-align:center; padding-bottom: 1rem;'>
-        <h3 class="sb-brand-title" style="margin-top:0.4rem;">Livestock Guardian</h3>
-        <p class="sb-brand-sub">AI Cattle ID System</p>
-    </div>
-    """, unsafe_allow_html=True)
+    
+    brand_html = (
+        '<div style="text-align:center; padding-bottom: 1rem;">'
+        '<h3 class="sb-brand-title" style="margin-top:0.4rem;">Livestock Guardian</h3>'
+        '<p class="sb-brand-sub">AI Cattle ID System</p>'
+        '</div>'
+    )
+    st.markdown(brand_html, unsafe_allow_html=True)
 
     st.markdown("---")
 
     if st.session_state.user:
         u = st.session_state.user
-        st.markdown(f"""
-        <div class="sb-block">
-            <p class="sb-label">Logged in as</p>
-            <h4 style='margin: 0.4rem 0; color: white;'>👤 {esc(u.get('name'))}</h4>
-            <p style='margin: 0; opacity: 0.65; font-size: 0.78rem;'>CNIC: {esc(u.get('cnic'))}</p>
-        </div>
-        """, unsafe_allow_html=True)
+        user_html = (
+            '<div class="sb-block">'
+            '<p class="sb-label">Logged in as</p>'
+            f'<h4 style="margin: 0.4rem 0; color: white;">👤 {esc(u.get("name"))}</h4>'
+            f'<p style="margin: 0; opacity: 0.65; font-size: 0.78rem;">CNIC: {esc(u.get("cnic"))}</p>'
+            '</div>'
+        )
+        st.markdown(user_html, unsafe_allow_html=True)
         if st.button("🚪 Logout", use_container_width=True):
             st.session_state.user = None
             st.rerun()
     else:
-        st.markdown("""
-        <div class="sb-block" style="text-align:center;">
-            <p style='margin: 0;'>👋 Welcome!</p>
-            <p style='margin: 0.4rem 0 0; font-size: 0.8rem; opacity: 0.75;'>Login to register and manage animals</p>
-        </div>
-        """, unsafe_allow_html=True)
+        welcome_html = (
+            '<div class="sb-block" style="text-align:center;">'
+            '<p style="margin: 0;">👋 Welcome!</p>'
+            '<p style="margin: 0.4rem 0 0; font-size: 0.8rem; opacity: 0.75;">Login to register and manage animals</p>'
+            '</div>'
+        )
+        st.markdown(welcome_html, unsafe_allow_html=True)
 
     st.markdown("---")
 
     db_status = check_db_connection()
     status_color = "#4CAF50" if db_status else "#E57373"
     status_text = "Online" if db_status else "Offline"
-    st.markdown(f"""
-    <div class="sb-block">
-        <p class="sb-label">System status</p>
-        <div style='display:flex; align-items:center; margin-top:0.45rem;'>
-            <span class="sb-status-dot" style="background:{status_color};"></span>
-            <span style='color:white; font-weight:600; font-size:0.9rem;'>{status_text}</span>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    
+    status_html = (
+        '<div class="sb-block">'
+        '<p class="sb-label">System status</p>'
+        '<div style="display:flex; align-items:center; margin-top:0.45rem;">'
+        f'<span class="sb-status-dot" style="background:{status_color};"></span>'
+        f'<span style="color:white; font-weight:600; font-size:0.9rem;">{status_text}</span>'
+        '</div>'
+        '</div>'
+    )
+    st.markdown(status_html, unsafe_allow_html=True)
 
     total_owners, total_animals, stolen, transfers = get_stats()
-    st.markdown(f"""
-    <div class="sb-block">
-        <p class="sb-label">Quick stats</p>
-        <div style='margin-top:0.6rem; font-size: 0.85rem; line-height: 1.7;'>
-            <div>👥 Users <b style="float:right;">{total_owners}</b></div>
-            <div>🐄 Animals <b style="float:right;">{total_animals}</b></div>
-            <div>🚨 Stolen <b style="float:right;">{stolen}</b></div>
-            <div>🔄 Transfers <b style="float:right;">{transfers}</b></div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    
+    stats_html = (
+        '<div class="sb-block">'
+        '<p class="sb-label">Quick stats</p>'
+        '<div style="margin-top:0.6rem; font-size: 0.85rem; line-height: 1.7;">'
+        f'<div>👥 Users <b style="float:right;">{total_owners}</b></div>'
+        f'<div>🐄 Animals <b style="float:right;">{total_animals}</b></div>'
+        f'<div>🚨 Stolen <b style="float:right;">{stolen}</b></div>'
+        f'<div>🔄 Transfers <b style="float:right;">{transfers}</b></div>'
+        '</div>'
+        '</div>'
+    )
+    st.markdown(stats_html, unsafe_allow_html=True)
 
     st.markdown("---")
-    st.markdown("""
-    <div style='text-align:center; opacity:0.6; font-size:0.72rem;'>
-        Made for farmers · © 2026 Livestock Guardian
-    </div>
-    """, unsafe_allow_html=True)
+    
+    footer_html = (
+        '<div style="text-align:center; opacity:0.6; font-size:0.72rem;">'
+        'Made for farmers · © 2026 Livestock Guardian'
+        '</div>'
+    )
+    st.markdown(footer_html, unsafe_allow_html=True)
 
 # ════════════════════════════════════════════════════════════
-# HERO (compact — gets users to the tabs fast)
+# HERO
 # ════════════════════════════════════════════════════════════
-st.markdown("""
-<div class="hero-section">
-    <div class="hero-badge">🚀 AI-Powered Biometric ID</div>
-    <h1 class="hero-title">🐄 Livestock Guardian</h1>
-    <p class="hero-subtitle">Identify any cattle from a muzzle photo — like a CNIC, but for animals</p>
-</div>
-""", unsafe_allow_html=True)
+hero_html = (
+    '<div class="hero-section">'
+    '<div class="hero-badge">🚀 AI-Powered Biometric ID</div>'
+    '<h1 class="hero-title">🐄 Livestock Guardian</h1>'
+    '<p class="hero-subtitle">Identify any cattle from a muzzle photo — like a CNIC, but for animals</p>'
+    '</div>'
+)
+st.markdown(hero_html, unsafe_allow_html=True)
 
 # ════════════════════════════════════════════════════════════
-# FEATURE STRIP — slim row, not competing with primary action
+# FEATURE STRIP
 # ════════════════════════════════════════════════════════════
-st.markdown("""
-<div class="feature-strip">
-    <div class="feature-pill"><span class="icon">🔍</span><div><p class="label">Instant Scan</p><p class="desc">Identify cattle in seconds</p></div></div>
-    <div class="feature-pill"><span class="icon">🆔</span><div><p class="label">Digital ID</p><p class="desc">Unique permanent record</p></div></div>
-    <div class="feature-pill"><span class="icon">🚨</span><div><p class="label">Theft Alerts</p><p class="desc">Reported on every scan</p></div></div>
-    <div class="feature-pill"><span class="icon">🔒</span><div><p class="label">Secure</p><p class="desc">Encrypted biometric data</p></div></div>
-</div>
-""", unsafe_allow_html=True)
+features_html = (
+    '<div class="feature-strip">'
+    '<div class="feature-pill"><span class="icon">🔍</span><div><p class="label">Instant Scan</p><p class="desc">Identify cattle in seconds</p></div></div>'
+    '<div class="feature-pill"><span class="icon">🆔</span><div><p class="label">Digital ID</p><p class="desc">Unique permanent record</p></div></div>'
+    '<div class="feature-pill"><span class="icon">🚨</span><div><p class="label">Theft Alerts</p><p class="desc">Reported on every scan</p></div></div>'
+    '<div class="feature-pill"><span class="icon">🔒</span><div><p class="label">Secure</p><p class="desc">Encrypted biometric data</p></div></div>'
+    '</div>'
+)
+st.markdown(features_html, unsafe_allow_html=True)
 
 # ════════════════════════════════════════════════════════════
 # TABS
@@ -658,10 +705,13 @@ with tab1:
                                     alert("warning", "Possible match", f"Confidence: {esc(result.get('confidence'))}% — verify manually")
 
                                 id_card(animal.get('livestock_id'))
-                                st.markdown(
-                                    f"<div style='text-align:center; margin:-0.5rem 0 1rem;'>{secure_pill('Verified ID')}</div>",
-                                    unsafe_allow_html=True
+                                
+                                pill_html = (
+                                    '<div style="text-align:center; margin:-0.5rem 0 1rem;">'
+                                    f'{secure_pill("Verified ID")}'
+                                    '</div>'
                                 )
+                                st.markdown(pill_html, unsafe_allow_html=True)
 
                                 st.markdown("**📋 Animal details**")
                                 col_a, col_b = st.columns(2)
@@ -677,13 +727,7 @@ with tab1:
 
                                 st.markdown("**👤 Owner information**")
                                 owner = animal.get('owners', {}) or {}
-                                st.markdown(f"""
-                                <div class="animal-card">
-                                    <div class="meta-row"><b>Name:</b> {esc(owner.get('name'), 'Unknown')}</div>
-                                    <div class="meta-row"><b>CNIC:</b> {esc(owner.get('cnic'), 'Unknown')}</div>
-                                    <div class="meta-row"><b>Phone:</b> {esc(owner.get('phone'), 'Unknown')}</div>
-                                </div>
-                                """, unsafe_allow_html=True)
+                                owner_info_card(owner)
 
                                 if animal.get("is_stolen"):
                                     alert("danger", "Last known location", esc(animal.get('stolen_location'), 'Unknown'))
@@ -717,12 +761,17 @@ with tab2:
             if reg_image:
                 col_img, col_tips = st.columns([1, 1])
                 col_img.image(reg_image, width=280, caption="Preview")
-                col_tips.markdown("""
-                <div class="alert alert-info">
-                    <h4>💡 Photo tips</h4>
-                    <p>Clear close-up · good lighting · front-facing · no shadows · higher resolution is better</p>
-                </div>
-                """, unsafe_allow_html=True)
+                
+                tips_html = (
+                    '<div class="alert alert-info">'
+                    '<div class="alert-icon">ℹ</div>'
+                    '<div class="alert-body">'
+                    '<h4>💡 Photo tips</h4>'
+                    '<p>Clear close-up · good lighting · front-facing · no shadows · higher resolution is better</p>'
+                    '</div>'
+                    '</div>'
+                )
+                col_tips.markdown(tips_html, unsafe_allow_html=True)
 
             st.markdown("**📋 Animal details**")
             c1, c2 = st.columns(2)
@@ -795,7 +844,7 @@ with tab2:
                                 st.error(f"❌ Database error: {e}")
 
 # ════════════════════════════════════════════════════════════
-# TAB 3: LOGIN
+# TAB 3: LOGIN / SIGN UP
 # ════════════════════════════════════════════════════════════
 with tab3:
     if st.session_state.user:
@@ -870,7 +919,7 @@ with tab3:
                             st.error(f"❌ {e}")
 
 # ════════════════════════════════════════════════════════════
-# TAB 4: STOLEN REGISTRY
+# TAB 4: STOLEN REGISTRY (FIXED!)
 # ════════════════════════════════════════════════════════════
 with tab4:
     alert("danger", "Stolen animals registry", "Public database of reported stolen livestock")
@@ -892,25 +941,8 @@ with tab4:
             alert("success", "No stolen animals", "The registry is currently clean.")
         else:
             for a in stolen_res.data:
-                owner = a.get('owners', {}) or {}
-                date_str = str(a.get('stolen_reported_at', ''))[:10]
-                desc_row = f"<div class='meta-row' style='font-style:italic;'>📝 {esc(a.get('stolen_description'))}</div>" if a.get('stolen_description') else ""
-                st.markdown(f"""
-                <div class="animal-card" style="--bar-color: var(--c-danger);">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                        <div>
-                            <div class="animal-id" style="color:var(--c-danger);">🚨 {esc(a.get('livestock_id'))}</div>
-                            <div class="animal-breed">{esc(a.get('breed'))} • {esc(a.get('color'))} • {esc(a.get('gender'))}</div>
-                            <div class="meta-row">📍 <b>Location:</b> {esc(a.get('stolen_location'))}</div>
-                            <div class="meta-row">📅 <b>Reported:</b> {esc(date_str)}</div>
-                            <div class="meta-row">👤 <b>Owner:</b> {esc(owner.get('name'), 'Unknown')}</div>
-                            <div class="meta-row">📞 <b>Contact:</b> {esc(owner.get('phone'), 'Unknown')}</div>
-                            {desc_row}
-                        </div>
-                        <span class="badge badge-stolen">STOLEN</span>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
+                # Use the helper function — clean and bug-free
+                stolen_animal_card(a)
 
     except Exception as e:
         st.error(f"❌ Error: {e}")
@@ -1002,7 +1034,7 @@ with tab5:
                 st.caption(f"Showing {len(filtered)} of {len(data)} animals")
 
                 for a in filtered:
-                    extra = f"<div class='meta-row' style='margin-top:0.4rem; color:var(--c-text-faint);'>Registered: {esc(str(a.get('registered_at', ''))[:10])}</div>"
+                    extra = f'<div class="meta-row" style="margin-top:0.4rem; color:var(--c-text-faint);">Registered: {esc(str(a.get("registered_at", ""))[:10])}</div>'
                     accent = "var(--c-danger)" if a.get("is_stolen") else "var(--c-primary)"
                     animal_summary_card(a, accent=accent, extra_rows=extra)
 
@@ -1053,10 +1085,11 @@ with tab5:
 # ════════════════════════════════════════════════════════════
 # FOOTER
 # ════════════════════════════════════════════════════════════
-st.markdown("""
-<div style="text-align:center; padding: 2rem 0 0.5rem; color: var(--c-text-faint);">
-    <hr>
-    <p style="margin: 0.4rem 0; font-weight:600; color: var(--c-text-muted);">🐄 Livestock Guardian — AI-Powered Cattle Identification</p>
-    <p style="margin: 0.2rem 0; font-size: 0.8rem;">© 2026 · Version 2.0</p>
-</div>
-""", unsafe_allow_html=True)
+footer_html = (
+    '<div style="text-align:center; padding: 2rem 0 0.5rem; color: var(--c-text-faint);">'
+    '<hr>'
+    '<p style="margin: 0.4rem 0; font-weight:600; color: var(--c-text-muted);">🐄 Livestock Guardian — AI-Powered Cattle Identification</p>'
+    '<p style="margin: 0.2rem 0; font-size: 0.8rem;">© 2026 · Version 2.1</p>'
+    '</div>'
+)
+st.markdown(footer_html, unsafe_allow_html=True)
