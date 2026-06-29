@@ -8,6 +8,7 @@ import requests
 import json
 import html as html_lib
 import time
+import os
 from datetime import datetime
 import uuid
 import hashlib
@@ -29,58 +30,68 @@ st.set_page_config(
 
 # ════════════════════════════════════════════════════════════
 # DESIGN TOKENS + CSS
-# All colors/spacing/radii live here as variables. Change once,
-# it propagates everywhere — no more hunting hex codes in markup.
+# Palette pulled from the Livestock Guardian brand: forest green
+# + gold shield logo, cream/off-white backgrounds, rounded pill
+# buttons, icon-led status cards. Change tokens once, it
+# propagates everywhere — no more hunting hex codes in markup.
 # ════════════════════════════════════════════════════════════
 st.markdown("""
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
     :root {
-        /* Brand */
-        --c-primary: #1F7A3D;
+        /* Brand — forest green + gold, from the app logo */
+        --c-primary: #2E7D32;
         --c-primary-dark: #14532D;
-        --c-primary-soft: #E7F3EA;
-        --c-accent: #1565C0;
-        --c-accent-soft: #E3F0FB;
+        --c-primary-soft: #E8F3E9;
+        --c-gold: #C9A227;
+        --c-gold-dark: #A8841C;
+        --c-gold-soft: #FBF3DD;
+        --c-accent: #2E7D32;
+        --c-accent-soft: #E8F3E9;
 
         /* Semantic */
-        --c-success: #1F7A3D;
-        --c-success-soft: #E7F3EA;
-        --c-danger: #B3261E;
-        --c-danger-soft: #FCEAE9;
-        --c-warning: #B25E00;
-        --c-warning-soft: #FFF3E0;
-        --c-info: #0B5C94;
-        --c-info-soft: #E8F2FA;
+        --c-success: #2E7D32;
+        --c-success-soft: #E8F3E9;
+        --c-danger: #C62828;
+        --c-danger-soft: #FBE9E9;
+        --c-warning: #B45F06;
+        --c-warning-soft: #FCEFDC;
+        --c-info: #2E7D32;
+        --c-info-soft: #E8F3E9;
 
-        /* Neutrals */
-        --c-text: #1A1D1E;
-        --c-text-muted: #5B6166;
-        --c-text-faint: #8A9095;
-        --c-border: #E3E6E8;
+        /* Neutrals — warm cream background like the reference screens */
+        --c-text: #20241F;
+        --c-text-muted: #6B7268;
+        --c-text-faint: #9AA199;
+        --c-border: #E7E4DC;
         --c-surface: #FFFFFF;
-        --c-bg: #F6F7F8;
+        --c-bg: #F8F6F1;
 
-        /* Spacing / radius */
-        --radius-sm: 8px;
-        --radius-md: 12px;
-        --radius-lg: 16px;
-        --shadow-sm: 0 1px 3px rgba(16,24,32,0.06);
-        --shadow-md: 0 4px 14px rgba(16,24,32,0.08);
+        /* Spacing / radius — generous, rounded, like the mobile cards */
+        --radius-sm: 10px;
+        --radius-md: 16px;
+        --radius-lg: 22px;
+        --radius-pill: 999px;
+        --shadow-sm: 0 1px 4px rgba(20,40,20,0.06);
+        --shadow-md: 0 6px 18px rgba(20,40,20,0.10);
+        --font-heading: 'Poppins', 'Inter', sans-serif;
+        --font-body: 'Inter', sans-serif;
     }
 
-    /* Respect motion preferences globally */
     @media (prefers-reduced-motion: reduce) {
         *, *::before, *::after { animation: none !important; transition: none !important; }
     }
 
-    .main { padding: 0.5rem 1.5rem; }
+    .main { padding: 0.5rem 1.5rem; background: var(--c-bg); font-family: var(--font-body); }
+    [data-testid="stAppViewContainer"] { background: var(--c-bg); }
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
 
-    body, .main, [class^="css"] { color: var(--c-text); }
+    body, .main, [class^="css"] { color: var(--c-text); font-family: var(--font-body); }
+    h1, h2, h3, h4 { font-family: var(--font-heading); }
 
-    /* ─── HERO (compact, responsive) ─── */
+    /* ─── HERO ─── */
     .hero-section {
         background: linear-gradient(135deg, var(--c-primary) 0%, var(--c-primary-dark) 100%);
         padding: clamp(1.5rem, 4vw, 2.5rem) 1.5rem;
@@ -89,8 +100,10 @@ st.markdown("""
         text-align: center;
         margin-bottom: 1.5rem;
         box-shadow: var(--shadow-md);
+        border: 1px solid rgba(201,162,39,0.35);
     }
     .hero-title {
+        font-family: var(--font-heading);
         font-size: clamp(1.8rem, 4vw, 2.6rem);
         font-weight: 800;
         margin: 0;
@@ -104,34 +117,41 @@ st.markdown("""
     }
     .hero-badge {
         display: inline-block;
-        background: rgba(255,255,255,0.18);
+        background: rgba(201,162,39,0.22);
+        color: #F5E3A3;
         padding: 0.35rem 1.1rem;
-        border-radius: 30px;
+        border-radius: var(--radius-pill);
         margin-bottom: 0.75rem;
         font-size: 0.8rem;
         font-weight: 600;
         letter-spacing: 0.02em;
     }
 
-    /* ─── FEATURE STRIP (slim, not competing with hero) ─── */
-    .feature-strip {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-        margin-bottom: 1.25rem;
+    /* ─── SECURE / VERIFIED PILL (matches "Secure · ID" chip) ─── */
+    .secure-pill {
+        display: inline-flex; align-items: center; gap: 0.3rem;
+        background: var(--c-success-soft); color: var(--c-primary);
+        padding: 0.25rem 0.8rem; border-radius: var(--radius-pill);
+        font-size: 0.72rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase;
     }
+
+    /* ─── FEATURE STRIP ─── */
+    .feature-strip { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
     .feature-pill {
         flex: 1 1 200px;
         background: var(--c-surface);
         border: 1px solid var(--c-border);
         border-radius: var(--radius-md);
         padding: 0.85rem 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.6rem;
+        display: flex; align-items: center; gap: 0.6rem;
+        box-shadow: var(--shadow-sm);
     }
-    .feature-pill .icon { font-size: 1.4rem; flex-shrink: 0; }
-    .feature-pill .label { font-weight: 600; font-size: 0.9rem; color: var(--c-text); }
+    .feature-pill .icon {
+        font-size: 1.2rem; flex-shrink: 0; width: 2.1rem; height: 2.1rem;
+        display: flex; align-items: center; justify-content: center;
+        background: var(--c-gold-soft); border-radius: 50%;
+    }
+    .feature-pill .label { font-weight: 700; font-size: 0.9rem; color: var(--c-text); font-family: var(--font-heading); }
     .feature-pill .desc { font-size: 0.78rem; color: var(--c-text-muted); margin: 0; }
 
     /* ─── STAT CARDS ─── */
@@ -140,11 +160,20 @@ st.markdown("""
         padding: 1.1rem 1.2rem;
         border-radius: var(--radius-md);
         border: 1px solid var(--c-border);
-        border-left: 4px solid var(--bar-color, var(--c-primary));
         box-shadow: var(--shadow-sm);
     }
-    .stat-number { font-size: 2rem; font-weight: 800; color: var(--c-text); margin: 0; line-height: 1; }
+    .stat-number { font-family: var(--font-heading); font-size: 2rem; font-weight: 800; color: var(--c-text); margin: 0; line-height: 1; }
     .stat-label { color: var(--c-text-muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.35rem; }
+
+    /* ─── INFO TILE (2-up grid like the Species/Breed/Age/Weight cards) ─── */
+    .tile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; margin: 0.75rem 0; }
+    .info-tile {
+        background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-md);
+        padding: 0.9rem 1rem; box-shadow: var(--shadow-sm);
+    }
+    .info-tile .tile-icon { font-size: 1.1rem; }
+    .info-tile .tile-label { color: var(--c-text-muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; margin: 0.3rem 0 0.1rem; }
+    .info-tile .tile-value { font-family: var(--font-heading); font-weight: 700; font-size: 1.05rem; color: var(--c-text); }
 
     /* ─── ANIMAL / GENERIC CARDS ─── */
     .animal-card {
@@ -154,35 +183,57 @@ st.markdown("""
         border: 1px solid var(--c-border);
         border-left: 4px solid var(--bar-color, var(--c-primary));
         margin-bottom: 0.75rem;
+        box-shadow: var(--shadow-sm);
     }
-    .animal-id { font-size: 1.15rem; font-weight: 700; color: var(--c-text); font-family: 'JetBrains Mono', 'Courier New', monospace; letter-spacing: 0.02em; }
+    .animal-id { font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--c-text); letter-spacing: 0.02em; }
     .animal-breed { color: var(--c-text-muted); font-size: 0.9rem; margin-top: 0.25rem; }
     .meta-row { color: var(--c-text-muted); font-size: 0.85rem; margin: 0.2rem 0; }
     .meta-row b { color: var(--c-text); font-weight: 600; }
 
     /* ─── BADGES ─── */
-    .badge { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.25rem 0.7rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.02em; }
-    .badge-active { background: var(--c-success-soft); color: var(--c-success); }
+    .badge { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.28rem 0.75rem; border-radius: var(--radius-pill); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.02em; }
+    .badge-active { background: var(--c-success-soft); color: var(--c-primary); }
     .badge-stolen { background: var(--c-danger-soft); color: var(--c-danger); }
 
-    /* ─── ALERTS (one calm style per semantic type, no infinite pulse) ─── */
-    .alert { border-radius: var(--radius-md); padding: 1.1rem 1.25rem; margin: 0.75rem 0; border: 1px solid transparent; }
-    .alert h3, .alert h2, .alert h4 { margin: 0 0 0.3rem 0; }
-    .alert p { margin: 0; font-size: 0.9rem; }
-    .alert-success { background: var(--c-success-soft); border-color: rgba(31,122,61,0.25); color: var(--c-primary-dark); }
-    .alert-danger  { background: var(--c-danger-soft); border-color: rgba(179,38,30,0.25); color: var(--c-danger); }
-    .alert-warning { background: var(--c-warning-soft); border-color: rgba(178,94,0,0.25); color: var(--c-warning); }
-    .alert-info    { background: var(--c-info-soft); border-color: rgba(11,92,148,0.25); color: var(--c-info); }
+    /* ─── ALERTS — icon-in-circle + title + body, like the Theft Alert /
+       Health Warning cards in the reference dashboard ─── */
+    .alert {
+        border-radius: var(--radius-md);
+        padding: 1rem 1.15rem;
+        margin: 0.75rem 0;
+        display: flex; align-items: flex-start; gap: 0.75rem;
+        border: 1px solid transparent;
+    }
+    .alert .alert-icon {
+        flex-shrink: 0; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center; font-size: 1.05rem;
+    }
+    .alert .alert-body h3, .alert .alert-body h4 { margin: 0 0 0.2rem 0; font-family: var(--font-heading); font-size: 1rem; }
+    .alert .alert-body p { margin: 0; font-size: 0.86rem; color: var(--c-text-muted); }
+    .alert-success { background: var(--c-success-soft); }
+    .alert-success .alert-icon { background: rgba(46,125,50,0.18); color: var(--c-primary); }
+    .alert-success .alert-body h3 { color: var(--c-primary-dark); }
+    .alert-danger  { background: var(--c-danger-soft); }
+    .alert-danger .alert-icon { background: rgba(198,40,40,0.16); color: var(--c-danger); }
+    .alert-danger .alert-body h3 { color: var(--c-danger); }
+    .alert-warning { background: var(--c-warning-soft); }
+    .alert-warning .alert-icon { background: rgba(180,95,6,0.16); color: var(--c-warning); }
+    .alert-warning .alert-body h3 { color: var(--c-warning); }
+    .alert-info    { background: var(--c-gold-soft); }
+    .alert-info .alert-icon { background: rgba(201,162,39,0.25); color: var(--c-gold-dark); }
+    .alert-info .alert-body h3 { color: var(--c-gold-dark); }
     /* One subtle, finite emphasis for genuinely urgent items — not infinite */
     .alert-danger.urgent { animation: flash-once 1.4s ease-out 1; }
-    @keyframes flash-once { 0% { box-shadow: 0 0 0 4px rgba(179,38,30,0.25); } 100% { box-shadow: 0 0 0 0 rgba(179,38,30,0); } }
+    @keyframes flash-once { 0% { box-shadow: 0 0 0 4px rgba(198,40,40,0.22); } 100% { box-shadow: 0 0 0 0 rgba(198,40,40,0); } }
 
-    /* ─── BUTTONS ─── */
+    /* ─── BUTTONS — rounded pill, matching Login/Sign Up/Enroll buttons ─── */
     .stButton > button {
-        border-radius: var(--radius-sm);
-        font-weight: 600;
-        border: 1px solid var(--c-border);
-        transition: filter 0.15s ease;
+        border-radius: var(--radius-pill);
+        font-weight: 700;
+        font-family: var(--font-heading);
+        border: 1.5px solid var(--c-border);
+        padding: 0.5rem 1.4rem;
+        transition: filter 0.15s ease, transform 0.1s ease;
     }
     .stButton > button[kind="primary"] {
         background: var(--c-primary);
@@ -190,57 +241,67 @@ st.markdown("""
         color: white;
         box-shadow: var(--shadow-sm);
     }
-    .stButton > button[kind="primary"]:hover { filter: brightness(0.92); }
-    .stButton > button[kind="secondary"]:hover { background: var(--c-bg); }
+    .stButton > button[kind="primary"]:hover { filter: brightness(0.93); }
+    .stButton > button[kind="secondary"] { background: var(--c-surface); color: var(--c-primary); border-color: var(--c-primary); }
+    .stButton > button[kind="secondary"]:hover { background: var(--c-success-soft); }
+    .stFormSubmitButton > button[kind="primary"] { background: var(--c-primary); border-color: var(--c-primary); }
 
     /* ─── SIDEBAR ─── */
     [data-testid="stSidebar"] { background: var(--c-primary-dark); }
-    [data-testid="stSidebar"] * { color: white !important; }
+    [data-testid="stSidebar"] * { color: white !important; font-family: var(--font-body); }
     [data-testid="stSidebar"] .stButton > button {
-        background: rgba(255,255,255,0.12);
-        border: 1px solid rgba(255,255,255,0.25);
+        background: rgba(201,162,39,0.18);
+        border: 1px solid rgba(201,162,39,0.45);
+        border-radius: var(--radius-pill);
     }
-    [data-testid="stSidebar"] .stButton > button:hover { background: rgba(255,255,255,0.22); }
-    .sb-block { background: rgba(255,255,255,0.08); padding: 0.9rem 1rem; border-radius: var(--radius-md); margin-bottom: 0.85rem; }
+    [data-testid="stSidebar"] .stButton > button:hover { background: rgba(201,162,39,0.3); }
+    .sb-block { background: rgba(255,255,255,0.07); padding: 0.9rem 1rem; border-radius: var(--radius-md); margin-bottom: 0.85rem; border: 1px solid rgba(201,162,39,0.2); }
     .sb-label { margin: 0; opacity: 0.75; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
     .sb-status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 0.5rem; }
+    .sb-logo-wrap { text-align: center; padding: 0.75rem 0 1rem; }
+    .sb-logo-wrap img { max-width: 92px; border-radius: 50%; background: white; padding: 8px; }
+    .sb-brand-title { color: white; margin: 0.5rem 0 0; font-family: var(--font-heading); font-weight: 700; }
+    .sb-brand-sub { opacity: 0.7; font-size: 0.78rem; margin: 0.2rem 0 0; }
 
     /* ─── TABS ─── */
-    .stTabs [data-baseweb="tab-list"] { gap: 6px; background: var(--c-bg); padding: 0.4rem; border-radius: var(--radius-md); }
-    .stTabs [data-baseweb="tab"] { padding: 0.65rem 1.2rem; background: var(--c-surface); border-radius: var(--radius-sm); font-weight: 600; color: var(--c-text-muted); border: 1px solid var(--c-border); }
-    .stTabs [aria-selected="true"] { background: var(--c-primary) !important; color: white !important; border-color: var(--c-primary) !important; }
+    .stTabs [data-baseweb="tab-list"] { gap: 6px; background: var(--c-surface); padding: 0.4rem; border-radius: var(--radius-pill); border: 1px solid var(--c-border); }
+    .stTabs [data-baseweb="tab"] { padding: 0.6rem 1.2rem; background: transparent; border-radius: var(--radius-pill); font-weight: 600; font-family: var(--font-heading); color: var(--c-text-muted); border: none; }
+    .stTabs [aria-selected="true"] { background: var(--c-primary) !important; color: white !important; }
 
-    /* ─── INPUTS ─── */
-    .stTextInput input, .stTextArea textarea, .stNumberInput input {
-        border-radius: var(--radius-sm);
-        border: 1px solid var(--c-border);
+    /* ─── INPUTS — rounded rectangle, matching login/signup fields ─── */
+    .stTextInput input, .stTextArea textarea, .stNumberInput input, .stSelectbox > div > div, .stDateInput input {
+        border-radius: var(--radius-sm) !important;
+        border: 1.5px solid var(--c-border) !important;
+        background: var(--c-surface);
     }
     .stTextInput input:focus, .stTextArea textarea:focus {
-        border-color: var(--c-primary);
-        box-shadow: 0 0 0 3px rgba(31,122,61,0.12);
+        border-color: var(--c-primary) !important;
+        box-shadow: 0 0 0 3px rgba(46,125,50,0.12);
     }
 
     [data-testid="stFileUploader"] {
-        background: var(--c-bg);
+        background: var(--c-surface);
         border-radius: var(--radius-md);
-        border: 2px dashed var(--c-border);
+        border: 2px dashed var(--c-gold);
     }
 
     [data-testid="stMetric"] { background: var(--c-surface); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--c-border); }
-    [data-testid="stMetricValue"] { color: var(--c-text); font-size: 1.7rem !important; }
+    [data-testid="stMetricValue"] { color: var(--c-text); font-size: 1.7rem !important; font-family: var(--font-heading); }
 
-    /* ─── ID CARD ─── */
+    /* ─── ID CARD — green + gold, like the shield logo ─── */
     .id-card {
-        background: var(--c-primary-dark);
+        background: linear-gradient(135deg, var(--c-primary-dark) 0%, var(--c-primary) 100%);
         color: white;
         padding: 1.6rem;
         border-radius: var(--radius-lg);
         text-align: center;
         margin: 1.25rem auto;
         max-width: 460px;
+        border: 1px solid rgba(201,162,39,0.4);
+        box-shadow: var(--shadow-md);
     }
-    .id-card .id-title { font-size: 0.78rem; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.1em; }
-    .id-card .id-value { font-size: 2rem; font-weight: 800; font-family: 'JetBrains Mono', 'Courier New', monospace; margin: 0.6rem 0; letter-spacing: 0.04em; }
+    .id-card .id-title { font-size: 0.78rem; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.1em; color: #F5E3A3; }
+    .id-card .id-value { font-family: var(--font-heading); font-size: 2rem; font-weight: 800; margin: 0.6rem 0; letter-spacing: 0.04em; }
     .id-card .id-subtitle { opacity: 0.85; font-size: 0.85rem; }
 
     hr { border: none; border-top: 1px solid var(--c-border); margin: 1.5rem 0; }
@@ -262,21 +323,41 @@ def esc(value, default="N/A"):
 # instance — and every value passing through is escaped.
 # ════════════════════════════════════════════════════════════
 def alert(kind, title, message="", urgent=False):
-    icons = {"success": "✅", "danger": "🚨", "warning": "⚠️", "info": "ℹ️"}
+    """Icon-in-circle alert card, matching the Theft Alert / Health Warning
+    style from the reference dashboard."""
+    icons = {"success": "✓", "danger": "🔒", "warning": "!", "info": "ℹ"}
     cls = f"alert alert-{kind}" + (" urgent" if urgent and kind == "danger" else "")
     msg_html = f"<p>{message}</p>" if message else ""
     st.markdown(f"""
     <div class="{cls}">
-        <h3>{icons.get(kind, '')} {title}</h3>
-        {msg_html}
+        <div class="alert-icon">{icons.get(kind, '')}</div>
+        <div class="alert-body">
+            <h3>{title}</h3>
+            {msg_html}
+        </div>
     </div>
     """, unsafe_allow_html=True)
+
+def secure_pill(label="Secure", icon="🛡️"):
+    """Small chip like the 'Secure · ID' badge on the animal profile card."""
+    return f'<span class="secure-pill">{icon} {esc(label)}</span>'
 
 def stat_card(value, label, color="var(--c-primary)"):
     st.markdown(f"""
     <div class="stat-card" style="--bar-color: {color};">
         <p class="stat-number" style="color: {color};">{esc(value, '0')}</p>
         <p class="stat-label">{esc(label)}</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+def info_tile(icon, label, value):
+    """2-up tile like the Species / Breed / Age / Weight cards on the
+    reference animal profile screen."""
+    st.markdown(f"""
+    <div class="info-tile">
+        <div class="tile-icon">{icon}</div>
+        <div class="tile-label">{esc(label)}</div>
+        <div class="tile-value">{esc(value)}</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -412,12 +493,19 @@ def get_stats():
 # ════════════════════════════════════════════════════════════
 # SIDEBAR
 # ════════════════════════════════════════════════════════════
+LOGO_PATH = "assets/logo.png"
+
 with st.sidebar:
+    logo_col = st.columns([1, 2, 1])[1]
+    with logo_col:
+        if os.path.exists(LOGO_PATH):
+            st.image(LOGO_PATH, use_container_width=True)
+        else:
+            st.markdown("<div style='text-align:center; font-size:2.8rem;'>🐄</div>", unsafe_allow_html=True)
     st.markdown("""
-    <div style='text-align: center; padding: 0.75rem 0 1rem;'>
-        <div style='font-size: 2.8rem;'>🐄</div>
-        <h3 style='color: white; margin: 0.25rem 0 0;'>Livestock Guardian</h3>
-        <p style='opacity: 0.7; font-size: 0.78rem; margin: 0.2rem 0 0;'>AI Cattle ID System</p>
+    <div style='text-align:center; padding-bottom: 1rem;'>
+        <h3 class="sb-brand-title" style="margin-top:0.4rem;">Livestock Guardian</h3>
+        <p class="sb-brand-sub">AI Cattle ID System</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -570,14 +658,22 @@ with tab1:
                                     alert("warning", "Possible match", f"Confidence: {esc(result.get('confidence'))}% — verify manually")
 
                                 id_card(animal.get('livestock_id'))
+                                st.markdown(
+                                    f"<div style='text-align:center; margin:-0.5rem 0 1rem;'>{secure_pill('Verified ID')}</div>",
+                                    unsafe_allow_html=True
+                                )
 
                                 st.markdown("**📋 Animal details**")
                                 col_a, col_b = st.columns(2)
-                                col_a.markdown(f"**🐂 Breed:** {esc(animal.get('breed'))}")
-                                col_a.markdown(f"**🎨 Color:** {esc(animal.get('color'))}")
-                                col_b.markdown(f"**⚥ Gender:** {esc(animal.get('gender'))}")
-                                if animal.get('weight'):
-                                    col_b.markdown(f"**⚖️ Weight:** {esc(animal.get('weight'))} kg")
+                                with col_a:
+                                    info_tile("🐂", "Breed", animal.get('breed'))
+                                with col_b:
+                                    info_tile("🎨", "Color", animal.get('color'))
+                                col_c, col_d = st.columns(2)
+                                with col_c:
+                                    info_tile("⚥", "Gender", animal.get('gender'))
+                                with col_d:
+                                    info_tile("⚖️", "Weight", f"{animal.get('weight')} kg" if animal.get('weight') else "N/A")
 
                                 st.markdown("**👤 Owner information**")
                                 owner = animal.get('owners', {}) or {}
